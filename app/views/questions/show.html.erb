@@ -1,0 +1,152 @@
+<!-- Título de la Pregunta -->
+<div class="container">
+	<div class="row pt-3">
+		<h1><%= markdown(@question.title) %></h1>
+	</div>
+</div>
+
+<!-- Votos y Descripción de la Pregunta -->
+<div class="container">
+	<div class="row">
+		<div class="col-sm-1">
+			<% if user_signed_in? %>
+				<% if @question.qvoted_by? current_user %>
+					<%= link_to question_qvote_path(@question.id), method: :delete do %>
+						<span class="oi oi-caret-top votos"></span>
+						<h4 class="votos"><%= @question.qvotes.count %></h4>	
+					<% end %>
+				<% else %>
+					<%= link_to question_qvote_path(@question.id), method: :post do %>
+						<span class="oi oi-caret-top"></span>
+						<h4><%= @question.qvotes.count %></h4>	
+					<% end %>
+				<% end %>
+			<% else %>
+				<span class="oi oi-caret-top"></span>
+				<h4><%= @question.qvotes.count %></h4>
+			<% end %>
+		</div>
+		<div class="col-sm-11">
+			<h6><%= markdown(@question.description) %></h6>
+		</div>
+	</div>
+</div>
+
+
+<!-- Comentarios de la Pregunta -->
+<div class="container">
+	<div class="row m-1">
+		<div class="col-sm-10 offset-sm-1">
+			<% @question.comments.each do |q| %>
+				<h6 class="border border-right-0 border-left-0 border-bottom-0"><small><%= markdown(q.comment) %></small></h6>
+			<% end %>
+		</div>
+	</div>
+</div>
+
+<!-- Input para adicionar comentarios a la Pregunta (solo si hay usuario logeado) -->
+<% if user_signed_in? %>
+	<div class="container">
+		<div class="row m-1">
+			<div class="col-sm-10 offset-sm-1">
+
+				<%= form_for [@question, @question.comments.build] do |f| %>
+					<div class="form-group">
+			    		<%= f.text_area :comment, class: "form-control input-lg", placeholder: "Agrega un comentario a la Pregunta" %>
+			    	</div>
+				
+				  	<div class="col-sm-1 offset-sm-10">
+				  	  <%= f.submit "Comentar", class: "btn btn-primary" %>
+				  	</div>
+				<% end %>
+			</div>
+		</div>
+	</div>
+<% end %>
+
+
+<!-- Número de Respuestas a la Pregunta -->
+<div class="container">
+	<div class="row pt-3">
+		<h1><%= @question.answers.count %> Respuesta(s)</h1>
+	</div>
+</div>
+
+<!-- Votos, texto y comentarios de las respuestas -->
+<div class="container">
+	<% @question.answers.each do |a| %>
+		<div class="row mt-1">
+			<div class="col-sm-1">
+				<% if user_signed_in? %>
+					<% if a.avoted_by? current_user %>
+						<%= link_to answer_avote_path(a.id), method: :delete do %>
+							<span class="oi oi-caret-top votos"></span>
+							<h4 class="votos"><%= a.avotes.count %></h4>	
+						<% end %>
+					<% else %>
+						<%= link_to answer_avote_path(a.id), method: :post do %>
+							<span class="oi oi-caret-top"></span>
+							<h4><%= a.avotes.count %></h4>	
+						<% end %>
+					<% end %>
+				<% else %>
+					<span class="oi oi-caret-top"></span>
+					<h4><%= a.avotes.count %></h4>
+				<% end %>
+			</div>
+			<div class="col-sm-11">
+				<h6 class="border border-right-0 border-left-0 border-bottom-0"><%= markdown(a.answertext) %></h6>
+			</div>
+			<!-- Comentarios de la Respuesta -->
+			<div class="col-sm-10 offset-sm-2">
+				<% a.comments.each do |ac| %>
+					<h6 class="border border-right-0 border-left-0 border-bottom-0"><small><%= markdown(ac.comment) %></small></h6>
+				<% end %>
+			</div>
+			<!-- Input para adicionar comentarios a la Respuesta (solo si hay usuario logeado) -->
+			<% if user_signed_in? %>
+				<div class="container">
+					<div class="row m-1">
+						<div class="col-sm-9 offset-sm-2">
+							<%= form_for [a, a.comments.build] do |f| %>
+								<div class="form-group">
+						    		<%= f.text_area :comment, class: "form-control input-lg", placeholder: "Agrega un comentario a la Respuesta" %>
+						    	</div>
+							
+							  	<div class="col-sm-1 offset-sm-10">
+							  	  <%= f.submit "Comentar", class: "btn btn-primary" %>
+							  	</div>
+							<% end %>
+						</div>
+					</div>
+				</div>
+			<% end %>
+		</div>
+	<% end %>		
+</div>
+
+<!-- Input para adicionar una Respuesta (solo si hay usuario logeado) -->
+<% if user_signed_in? %>
+	<div class="container">
+		<div class="row pt-3">
+			<h1>Tu Respuesta</h1>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row m-1">
+			<div class="col-sm-10 offset-sm-1">
+				<%= form_for :answer, :url => answers_path do |a| %>
+					<div class="form-group">
+			    		<%= a.text_area :answertext, class: "form-control input-lg", placeholder: "Agrega tu respuesta" %>
+			    	</div>
+					<%= a.hidden_field :user_id, value: current_user.id %>
+					<%= a.hidden_field :question_id, value: @question.id %>
+				  	<div class="col-sm-1 offset-sm-10">
+				  	  <%= a.submit "Agregar", class: "btn btn-primary" %>
+				  	</div>
+				<% end %>
+			</div>
+		</div>
+	</div>
+<% end %>

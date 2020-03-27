@@ -1,0 +1,33 @@
+<div class="container">
+	<div class="row pt-3 justify-content-between">
+		<div class="col-sm-3">
+			<h1>Preguntas</h1>
+		</div>
+		<div class="col-sm-3 align-self-end">
+			<%= button_to "Hacer una Pregunta", new_question_path, class: "btn btn-primary", method: :get %>
+		</div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row pt-3">
+			<table class="table">
+				<% @questions.each do |q| %>
+					<tr>
+						<td class="text-center">
+							<h4><%= q.qvotes.count %></h4>
+							<p>Votos</p>
+						</td>
+						<td class="text-center">
+							<h4><%= q.answers.count %></h4>
+							<p>Respuesta(s)</p>
+						</td>
+						<td>
+							<h4><%= link_to markdown(q.title), question_path(q.id), class: "titulo" %></h4>
+							<p>Preguntó <%= q.user.email %> hace <%= time_ago(q.created_at) %></p>
+						</td>
+					</tr>
+				<% end %>
+			</table>
+	</div>
+</div>
